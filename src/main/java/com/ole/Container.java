@@ -11,7 +11,7 @@ public interface Container {
     void add(int number);
 
     /**
-     * Добавляет элемент по заданному индексу
+     * Добавляет элемент после заданного индекса
      * @param index Индекс элемента, за которым будет вставляться новый элемент
      * @param number Добавляемый элемент
      */
@@ -31,4 +31,9 @@ public interface Container {
      */
     boolean remove(int index);
 
+    /**
+     * Возвращает количество элементов в контейнере
+     * @return количество элементов в контейнере
+     */
+    int getSize();
 }

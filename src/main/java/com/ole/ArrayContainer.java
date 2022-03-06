@@ -2,17 +2,15 @@ package com.ole;
 
 public class ArrayContainer implements Container{
 
-    static final double scaleFactor = 1.5;
 
-    int[] container;
-    int length;
+    private static final double scaleFactor = 1.5;
 
-    ArrayContainer() {
+    private int[] container;
+    //реальное количество элементов в контейнере
+    private int length;
+
+    public ArrayContainer() {
         container = new int[10];
-    }
-
-    public int getCapacity() {
-        return container.length;
     }
 
     /**
@@ -22,34 +20,25 @@ public class ArrayContainer implements Container{
      */
     @Override
     public void add(int number) {
-        if(getCapacity()<=length) {
-            int newCapacity = (int) (length*scaleFactor);
-            int[] temporaryContainer = new int[newCapacity];
-            for (int i = 0; i < newCapacity; i++) {
-                temporaryContainer[i] = container[i];
-            }
-            temporaryContainer[length]=number;
-            container = temporaryContainer;
-        }
-        else {
-            container[length]=number;
-        }
-        length++;
+        add(length-1, number);
     }
 
     /**
-     * Добавляет элемент по заданному индексу
+     * Добавляет элемент после заданного индекса
      *
      * @param index  Индекс элемента, за которым будет вставляться новый элемент
      * @param number Добавляемый элемент
      */
     @Override
-    public void add(int index, int number) {
-        if(getCapacity()<=length) {
-
+    public void add(int index, int number) throws IndexOutOfBoundsException {
+        if(index>=length || index<0) {
+            throw new IndexOutOfBoundsException("Индекс выходит за пределы контейнера");
         }
         else {
-            for (int i = length; i > index ; i++) {
+            if(getCapacity()<=length) {
+                expand();
+            }
+            for (int i = length; i > index+1; i++) {
                 container[i]=container[i-1];
             }
             container[index]=number;
@@ -80,10 +69,42 @@ public class ArrayContainer implements Container{
     public boolean remove(int index) {
         if(index>=length || index<0)
             return false;
-        for (int i = index; i < length-1; i++) {
-            container[i]=container[i+1];
-        }
+        if (length - 1 - index >= 0) System.arraycopy(container, index + 1, container, index, length - 1 - index);
         length--;
+        if(getCapacity()>2*length*scaleFactor)
+            shrink();
         return true;
+    }
+
+    /**
+     * Возвращает количество элементов в контейнере
+     *
+     * @return количество элементов в контейнере
+     */
+    @Override
+    public int getSize() {
+        return length;
+    }
+
+    /**
+     *  Возвращает реальный размер контейнера
+     * @return реальный размер контейнера
+     */
+    public int getCapacity() {
+        return container.length;
+    }
+
+    private void expand() {
+        int newCapacity = (int) (length*scaleFactor);
+        int[] temporaryContainer = new int[newCapacity];
+        if (length >= 0) System.arraycopy(container, 0, temporaryContainer, 0, length);
+        container = temporaryContainer;
+    }
+
+    private void shrink() {
+        int newCapacity = (int)(length * scaleFactor);
+        int[] tempContainer = new int[newCapacity];
+        if (length >= 0) System.arraycopy(container, 0, tempContainer, 0, length);
+        container=tempContainer;
     }
 }
